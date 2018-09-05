@@ -1,0 +1,40 @@
+#!/bin/sh
+#PBS -N 3_Quantification
+#PBS -q high
+#PBS -l nodes=1:ppn=48,mem=120gb,walltime=10000:00:00
+#PBS -o log/
+#PBS -e log/
+
+export LC_ALL=C
+cd ${PBS_O_WORKDIR}
+
+Kmer=$(awk '{if(match($0,".*Kmer=([^; ]*)",a))print a[1]}' software.config)
+
+TRINITY_HOME=$(awk '{if(match($0,".*TRINITY_HOME=([^; ]*)",a))print a[1]}' software.config)
+transcripts=${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig
+samples_file=${PBS_O_WORKDIR}/files/samples_file.txt
+# (待优化 ↓ )
+fake_gene_trans_map=${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig.gene_trans_map
+
+mkdir -p ${PBS_O_WORKDIR}/../3_Quantification
+cd ${PBS_O_WORKDIR}/../3_Quantification
+
+${TRINITY_HOME}/util/align_and_estimate_abundance.pl \
+    --transcripts $transcripts \
+    --samples_file $samples_file \
+    --seqType fq \
+    --est_method RSEM \
+    --aln_method bowtie2 \
+    --thread_count 24 \
+    --prep_reference \
+    --gene_trans_map $fake_gene_trans_map
+
+ls */RSEM.genes.results > genes.quant_files.txt
+
+${TRINITY_HOME}/util/abundance_estimates_to_matrix.pl \
+    --est_method RSEM \
+    --cross_sample_norm TMM \
+    --name_sample_by_basedir \
+    --quant_files genes.quant_files.txt \
+    --out_prefix genes \
+    --gene_trans_map $fake_gene_trans_map

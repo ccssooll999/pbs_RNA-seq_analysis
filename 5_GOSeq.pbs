@@ -1,0 +1,58 @@
+#!/bin/sh
+#PBS -N 5_GOSeq
+#PBS -q high
+#PBS -l nodes=1:ppn=48,walltime=10000:00:00
+#PBS -o log/
+#PBS -e log/
+
+# 根据情况可能需要修改 LD_LIBRARY_PATH
+# export LD_LIBRARY_PATH="/XXX/XXX/XXX/lib:$LD_LIBRARY_PATH"
+export LC_ALL=C
+cd ${PBS_O_WORKDIR}
+
+Kmer=$(awk '{if(match($0,".*Kmer=([^; ]*)",a))print a[1]}' software.config)
+
+mkdir -p ${PBS_O_WORKDIR}/../5_GOSeq
+cd ${PBS_O_WORKDIR}/../5_GOSeq
+
+TRINITY_HOME=$(awk '{if(match($0,".*TRINITY_HOME=([^; ]*)",a))print a[1]}' software.config)
+TRINOTATE_HOME=$(awk '{if(match($0,".*TRINOTATE_HOME=([^; ]*)",a))print a[1]}' software.config)
+
+edgeR_name=(\
+"genes.isoform.counts.matrix.XXX_vs_YYY.edgeR" \
+)
+
+################################
+#从 Trinotate 结果中提取 GO 注释
+#参数：-T isoform， -G gene 层次
+################################
+
+Trinotate_report=${PBS_O_WORKDIR}/../2_Trinotate/Trinotate.xls
+perl ${TRINOTATE_HOME}/util/extract_GO_assignments_from_Trinotate_xls.pl \
+        --Trinotate_xls $Trinotate_report \
+        -T --include_ancestral_terms \
+        > go_annotations.txt
+
+# 长度
+transcript=${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig
+perl ${TRINITY_HOME}/util/misc/fasta_seq_length.pl $transcript > trans.lengths.txt
+     
+
+for i in ${edgeR_name[@]};
+do
+        ################################
+        #差异基因列表
+        ################################
+        de_lst=${PBS_O_WORKDIR}/../4_DESeq2/${i}.DE_results.lst
+        
+        #背景基因列表
+        background=${PBS_O_WORKDIR}/../4_DESeq2/${i}.count_matrix
+        
+        perl ${TRINITY_HOME}/Analysis/DifferentialExpression/run_GOseq.pl \
+                --genes_single_factor $de_lst \
+                --GO_assignments go_annotations.txt \
+                --lengths trans.lengths.txt \
+                --background $background
+        
+done
+

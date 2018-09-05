@@ -1,0 +1,28 @@
+#!/bin/sh
+#PBS -N 4_DESeq2
+#PBS -q high
+#PBS -l nodes=1:ppn=48,mem=120gb,walltime=10000:00:00
+#PBS -o log/
+#PBS -e log/
+
+export LC_ALL=C
+cd ${PBS_O_WORKDIR}
+
+mkdir -p ${PBS_O_WORKDIR}/../4_DESeq2
+cd ${PBS_O_WORKDIR}/../4_DESeq2
+
+TRINITY_HOME=$(awk '{if(match($0,".*TRINITY_HOME=([^; ]*)",a))print a[1]}' software.config)
+isoforms_counts_matrix=${PBS_O_WORKDIR}/../3_Quantification/genes.isoform.counts.matrix
+samples_file=${PBS_O_WORKDIR}/files/samples_file.txt
+
+run_DE_analysis.pl \
+        --matrix $isoforms_counts_matrix \
+        --method edgeR \
+        --samples_file $samples_file
+
+################################
+# 手动提取差异表达基因列表 ( ↓ 待优化 ↓ )
+################################
+
+# awk '($4>1 || $4<-1) && $7<0.05 && NR>1{print $1}' isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE_results > ../isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE.lst
+# ln -s isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE_results ../isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE_results

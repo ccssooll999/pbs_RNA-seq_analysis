@@ -1,0 +1,32 @@
+#!/bin/sh
+#PBS -N 1_SOAPdenovo-Trans
+#PBS -q FAT_HIGH
+#PBS -l nodes=1:ppn=80,walltime=10000:00:00
+#PBS -o log/
+#PBS -e log/
+
+export LC_ALL=C
+cd ${PBS_O_WORKDIR}
+
+################################
+# 选择 K 值 需调整！！！
+Kmers=(43 45 47)
+################################
+
+for Kmer in ${Kmers[@]}
+do
+
+    mkdir -p ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/
+    cd ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/
+    SOAPdenovo-Trans-127mer all -s ${PBS_O_WORKDIR}/files/SOAPdenovo-Trans.config -o ${Kmer} -p 40 -K ${Kmer}
+
+    mkdir -p ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans_quast/
+    cd ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans_quast/
+    ln -s ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig ${Kmer}.contig
+
+    quast -o QUAST_ALL *.*
+    
+    date
+    echo 'Finish!!!'
+
+done

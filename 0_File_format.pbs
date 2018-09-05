@@ -1,0 +1,23 @@
+#!/bin/sh
+#PBS -N 0_File_Format
+#PBS -q high
+#PBS -l nodes=1:ppn=48,walltime=100:00:00
+#PBS -o log/
+#PBS -e log/
+
+export LC_ALL=C
+cd ${PBS_O_WORKDIR}
+
+file_name=Cleandata
+start_path=$(awk '{if(match($0,".*start_path=([^; ]*)",a))print a[1]}' software.config)
+
+mkdir -p ${PBS_O_WORKDIR}/../0_File_Format
+cp -rf ${PBS_O_WORKDIR}/../${file_name}/* ${PBS_O_WORKDIR}/../0_File_Format/
+
+python ${PBS_O_WORKDIR}/script/unzip_mini.py ${PBS_O_WORKDIR}/../0_File_Format/ > ${PBS_O_WORKDIR}/files/unzip_mini.cmds
+parallel --jobs 24 -a ${PBS_O_WORKDIR}/files/unzip_mini.cmds
+
+python ${PBS_O_WORKDIR}/script/samples_file.py ${PBS_O_WORKDIR}/../0_File_Format/ | sort > ${PBS_O_WORKDIR}/files/samples_file.txt
+
+cp -rf ${PBS_O_WORKDIR}/files/SOAPdenovo-Trans.config.mould ${PBS_O_WORKDIR}/files/SOAPdenovo-Trans.config
+awk '{print "q1="$3} {print "q2="$4}' ${PBS_O_WORKDIR}/files/samples_file.txt >> ${PBS_O_WORKDIR}/files/SOAPdenovo-Trans.config

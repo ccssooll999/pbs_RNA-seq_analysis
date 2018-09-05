@@ -1,0 +1,45 @@
+#!/bin/sh
+#PBS -N 2_Trinotate
+#PBS -q high
+#PBS -l nodes=1:ppn=48,mem=120gb,walltime=10000:00:00
+#PBS -o log/
+#PBS -e log/
+
+################################
+# 使用 Trinotate 前需构建数据库
+# 需生成 gene_trans_map 文件
+# 需对 contig 格式化处理 （ ↑ 待优化 ↑ ）
+################################
+
+export LC_ALL=C
+cd ${PBS_O_WORKDIR}
+
+Kmer=$(awk '{if(match($0,".*Kmer=([^; ]*)",a))print a[1]}' software.config)
+
+Database=$(awk '{if(match($0,".*Database=([^; ]*)",a))print a[1]}' software.config)
+TRINOTATE_HOME=$(awk '{if(match($0,".*TRINOTATE_HOME=([^; ]*)",a))print a[1]}' software.config)
+TRINOTATE_version=$(awk '{if(match($0,".*TRINOTATE_version=([^; ]*)",a))print a[1]}' software.config)
+Date=$(date +%s)
+
+mkdir -p ${PBS_O_WORKDIR}/../2_Trinotate
+cd ${PBS_O_WORKDIR}/../2_Trinotate
+
+# 解决 SQLite3 I/O error
+mkdir -p /tmp/2_Trinotate_${Date}
+cd /tmp/2_Trinotate_${Date}
+
+cp -rf ${Database}/Trinotate/${TRINOTATE_version}.sqlite Trinotate.sqlite
+cp -rf ${PBS_O_WORKDIR}/pbs_RNA-seq_analysis/files/conf.txt conf.txt
+ln -sf ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig SOAPdenovo-Trans.fasta
+ln -sf ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig.gene_trans_map SOAPdenovo-Trans.fasta.gene_trans_map
+
+perl ${TRINOTATE_HOME}/auto/autoTrinotate.pl \
+        --Trinotate_sqlite Trinotate.sqlite \
+        --transcripts SOAPdenovo-Trans.fasta \
+        --gene_to_trans_map SOAPdenovo-Trans.fasta.gene_trans_map \
+        --conf conf.txt \
+        --CPU 24
+
+
+# 解决 SQLite3 I/O error
+mv -f /tmp/2_Trinotate_${Date}/* ${PBS_O_WORKDIR}/../2_Trinotate/
