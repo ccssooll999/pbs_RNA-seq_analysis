@@ -19,10 +19,17 @@ Kmer=$(awk '{if(match($0,".*Kmer=([^; ]*)",a))print a[1]}' software.config)
 Database=$(awk '{if(match($0,".*Database=([^; ]*)",a))print a[1]}' software.config)
 TRINOTATE_HOME=$(awk '{if(match($0,".*TRINOTATE_HOME=([^; ]*)",a))print a[1]}' software.config)
 TRINOTATE_version=$(awk '{if(match($0,".*TRINOTATE_version=([^; ]*)",a))print a[1]}' software.config)
+TRANSDECODER_DIR=$(awk '{if(match($0,".*TRANSDECODER_DIR=([^; ]*)",a))print a[1]}' software.config)
+SWISSPROT_PEP=$(awk '{if(match($0,".*SWISSPROT_PEP=([^; ]*)",a))print a[1]}' software.config)
+PFAM_DB=$(awk '{if(match($0,".*PFAM_DB=([^; ]*)",a))print a[1]}' software.config)
 Date=$(date +%s)
 
 mkdir -p ${PBS_O_WORKDIR}/../2_Trinotate
 cd ${PBS_O_WORKDIR}/../2_Trinotate
+cp -rf ${PBS_O_WORKDIR}/files/conf.txt.mould ${PBS_O_WORKDIR}/files/conf.txt
+sed -i "s#TRANSDECODER_DIR=#TRANSDECODER_DIR=${TRANSDECODER_DIR}#g" ${PBS_O_WORKDIR}/files/conf.txt
+sed -i "s#SWISSPROT_PEP=#SWISSPROT_PEP=${SWISSPROT_PEP}#g" ${PBS_O_WORKDIR}/files/conf.txt
+sed -i "s#PFAM_DB=#PFAM_DB=${PFAM_DB}#g" ${PBS_O_WORKDIR}/files/conf.txt
 
 # 解决 SQLite3 I/O error
 mkdir -p /tmp/2_Trinotate_${Date}

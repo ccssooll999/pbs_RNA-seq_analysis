@@ -10,7 +10,7 @@
 #  ** edit the progs and dbs section to point to your local resources.
 
 # progs
-TRANSDECODER_DIR=/public/home/chensu/miniconda2/opt/transdecoder
+TRANSDECODER_DIR=
 BLASTX_PROG=diamond blastx
 BLASTP_PROG=diamond blastp
 SIGNALP_PROG=
@@ -20,8 +20,8 @@ RNAMMER=
 HMMSCAN_PROG=hmmscan
 
 # dbs
-SWISSPROT_PEP=/public/home/chensu/others/chensong/database/Trinotate/uniprot_sprot.pep
-PFAM_DB=/public/home/chensu/others/chensong/database/Trinotate/Pfam-A.hmm
+SWISSPROT_PEP=
+PFAM_DB=
 
 
 ####################
