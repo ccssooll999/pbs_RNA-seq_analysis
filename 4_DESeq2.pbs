@@ -6,10 +6,10 @@
 #PBS -e log/
 
 export LC_ALL=C
-cd ${PBS_O_WORKDIR}
+cd ${PBS_O_WORKDIR} || exit -1
 
 mkdir -p ${PBS_O_WORKDIR}/../4_DESeq2
-cd ${PBS_O_WORKDIR}/../4_DESeq2
+cd ${PBS_O_WORKDIR}/../4_DESeq2 || exit -1
 
 TRINITY_HOME=$(awk '{if(match($0,".*TRINITY_HOME=([^; ]*)",a))print a[1]}' software.config)
 isoforms_counts_matrix=${PBS_O_WORKDIR}/../3_Quantification/genes.isoform.counts.matrix

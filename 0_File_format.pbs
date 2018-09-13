@@ -6,7 +6,7 @@
 #PBS -e log/
 
 export LC_ALL=C
-cd ${PBS_O_WORKDIR}
+cd ${PBS_O_WORKDIR} || exit -1
 
 file_name=Cleandata
 start_path=$(awk '{if(match($0,".*start_path=([^; ]*)",a))print a[1]}' software.config)

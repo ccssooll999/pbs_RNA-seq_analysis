@@ -12,7 +12,7 @@
 ################################
 
 export LC_ALL=C
-cd ${PBS_O_WORKDIR}
+cd ${PBS_O_WORKDIR} || exit -1
 
 Kmer=$(awk '{if(match($0,".*Kmer=([^; ]*)",a))print a[1]}' software.config)
 
@@ -25,7 +25,7 @@ PFAM_DB=$(awk '{if(match($0,".*PFAM_DB=([^; ]*)",a))print a[1]}' software.config
 Date=$(date +%s)
 
 mkdir -p ${PBS_O_WORKDIR}/../2_Trinotate
-cd ${PBS_O_WORKDIR}/../2_Trinotate
+cd ${PBS_O_WORKDIR}/../2_Trinotate || exit -1
 cp -rf ${PBS_O_WORKDIR}/files/conf.txt.mould ${PBS_O_WORKDIR}/files/conf.txt
 sed -i "s#TRANSDECODER_DIR=#TRANSDECODER_DIR=${TRANSDECODER_DIR}#g" ${PBS_O_WORKDIR}/files/conf.txt
 sed -i "s#SWISSPROT_PEP=#SWISSPROT_PEP=${SWISSPROT_PEP}#g" ${PBS_O_WORKDIR}/files/conf.txt
@@ -33,7 +33,7 @@ sed -i "s#PFAM_DB=#PFAM_DB=${PFAM_DB}#g" ${PBS_O_WORKDIR}/files/conf.txt
 
 # 解决 SQLite3 I/O error
 mkdir -p /tmp/2_Trinotate_${Date}
-cd /tmp/2_Trinotate_${Date}
+cd /tmp/2_Trinotate_${Date} || exit -1
 
 cp -rf ${Database}/Trinotate/${TRINOTATE_version}.sqlite Trinotate.sqlite
 cp -rf ${PBS_O_WORKDIR}/pbs_RNA-seq_analysis/files/conf.txt conf.txt

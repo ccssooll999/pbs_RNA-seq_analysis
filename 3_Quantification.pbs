@@ -6,7 +6,7 @@
 #PBS -e log/
 
 export LC_ALL=C
-cd ${PBS_O_WORKDIR}
+cd ${PBS_O_WORKDIR} || exit -1
 
 Kmer=$(awk '{if(match($0,".*Kmer=([^; ]*)",a))print a[1]}' software.config)
 
@@ -17,7 +17,7 @@ samples_file=${PBS_O_WORKDIR}/files/samples_file.txt
 fake_gene_trans_map=${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig.gene_trans_map
 
 mkdir -p ${PBS_O_WORKDIR}/../3_Quantification
-cd ${PBS_O_WORKDIR}/../3_Quantification
+cd ${PBS_O_WORKDIR}/../3_Quantification || exit -1
 
 ${TRINITY_HOME}/util/align_and_estimate_abundance.pl \
     --transcripts $transcripts \

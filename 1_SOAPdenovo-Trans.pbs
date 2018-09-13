@@ -6,7 +6,7 @@
 #PBS -e log/
 
 export LC_ALL=C
-cd ${PBS_O_WORKDIR}
+cd ${PBS_O_WORKDIR} || exit -1
 
 ################################
 # 选择 K 值 需调整！！！
@@ -17,11 +17,11 @@ for Kmer in ${Kmers[@]}
 do
 
     mkdir -p ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/
-    cd ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/
+    cd ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/ || exit -1
     SOAPdenovo-Trans-127mer all -s ${PBS_O_WORKDIR}/files/SOAPdenovo-Trans.config -o ${Kmer} -p 40 -K ${Kmer}
 
     mkdir -p ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans_quast/
-    cd ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans_quast/
+    cd ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans_quast/ || exit -1
     ln -s ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig ${Kmer}.contig
 
     quast -o QUAST_ALL *.*

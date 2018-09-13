@@ -8,12 +8,12 @@
 # 根据情况可能需要修改 LD_LIBRARY_PATH
 # export LD_LIBRARY_PATH="/XXX/XXX/XXX/lib:$LD_LIBRARY_PATH"
 export LC_ALL=C
-cd ${PBS_O_WORKDIR}
+cd ${PBS_O_WORKDIR} || exit -1
 
 Kmer=$(awk '{if(match($0,".*Kmer=([^; ]*)",a))print a[1]}' software.config)
 
 mkdir -p ${PBS_O_WORKDIR}/../5_GOSeq
-cd ${PBS_O_WORKDIR}/../5_GOSeq
+cd ${PBS_O_WORKDIR}/../5_GOSeq || exit -1
 
 TRINITY_HOME=$(awk '{if(match($0,".*TRINITY_HOME=([^; ]*)",a))print a[1]}' software.config)
 TRINOTATE_HOME=$(awk '{if(match($0,".*TRINOTATE_HOME=([^; ]*)",a))print a[1]}' software.config)
