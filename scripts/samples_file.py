@@ -35,4 +35,4 @@ if __name__ == "__main__":
     # 绝对路径
     # start_path = ''
 
-    samples_file(*sys.argv[1])
+    samples_file(sys.argv[1])

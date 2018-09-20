@@ -37,4 +37,4 @@ if __name__ == "__main__":
     # 绝对路径    
     # start_path = ''
 
-    unzip_linux(*sys.argv[1])
+    unzip_linux(sys.argv[1])
