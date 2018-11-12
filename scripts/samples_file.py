@@ -26,6 +26,7 @@ def samples_file(start_path):
                         f_name_rep = f_name + "_rep" + name.split("/")[-2][-1]
                         fq1 = name    
                         fq2 = name[:-4] + '2' + name[-3:]
+                        # 待修复：如果不存在 rep -> bug
                         cmd = '{0}\t{1}\t{2}\t{3}'.format(f_name, f_name_rep, fq1, fq2)
                         print(cmd)
                     

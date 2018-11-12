@@ -20,9 +20,22 @@ run_DE_analysis.pl \
         --method edgeR \
         --samples_file $samples_file
 
+####################
+# 结果路径（可调整）#
+cd edgeR.*
+####################
+
+for i in *.DE_results
+do
+    awk '($4>1 || $4<-1) && $7<0.05 && NR>1{print $1}' $i > ../$i.tmp
+    cp $i ../$i
+done
+
+rename DE_results.tmp DE.lst ../*
+
 ################################
-# 手动提取差异表达基因列表 ( ↓ 待优化 ↓ )
+# 手动提取差异表达基因列表
 ################################
 
 # awk '($4>1 || $4<-1) && $7<0.05 && NR>1{print $1}' isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE_results > ../isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE.lst
-# ln -s isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE_results ../isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE_results
+# cp isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE_results ../isoforms.counts.matrix.XXX_vs_YYY.edgeR.DE_results
