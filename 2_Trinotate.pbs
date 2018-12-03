@@ -36,7 +36,7 @@ mkdir -p /tmp/2_Trinotate_${Date}
 cd /tmp/2_Trinotate_${Date} || exit -1
 
 cp -rf ${Database}/Trinotate/${TRINOTATE_version}.sqlite Trinotate.sqlite
-cp -rf ${PBS_O_WORKDIR}/pbs_RNA-seq_analysis/files/conf.txt conf.txt
+cp -rf ${PBS_O_WORKDIR}/files/conf.txt conf.txt
 ln -sf ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig SOAPdenovo-Trans.fasta
 ln -sf ${PBS_O_WORKDIR}/../1_SOAPdenovo-Trans-${Kmer}/${Kmer}.contig.gene_trans_map SOAPdenovo-Trans.fasta.gene_trans_map
 
